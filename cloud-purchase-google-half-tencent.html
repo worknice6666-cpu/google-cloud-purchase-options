@@ -381,9 +381,43 @@
       font-size: 13px;
     }
 
+    #tencent-plan > header {
+      display: grid;
+      grid-template-columns: 1.5fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    #tencent-plan > header > .hero,
+    #tencent-plan > .hero > .hero-main {
+      padding: 42px;
+      color: #ffffff;
+      background:
+        linear-gradient(135deg, rgba(18, 61, 115, 0.96), rgba(23, 100, 216, 0.92)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 14px);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin-bottom: 0;
+    }
+
+    #tencent-plan > header > .hero h1,
+    #tencent-plan > header > .hero p,
+    #tencent-plan > header > .hero .eyebrow,
+    #tencent-plan > .hero > .hero-main h1,
+    #tencent-plan > .hero > .hero-main p,
+    #tencent-plan > .hero > .hero-main .eyebrow {
+      color: inherit;
+    }
+
     @media (max-width: 860px) {
       .topbar-inner,
       .hero,
+      #tencent-plan > header,
       .grid-3,
       .two-col {
         grid-template-columns: 1fr;
@@ -578,8 +612,8 @@
     </section>
 
 <section id="tencent-plan" class="plan" aria-label="腾讯云国内产品年度采购方案">
-<header>
       <div class="hero">
+      <div class="hero-main">
         <div>
           <p class="eyebrow">Tencent Cloud Annual Procurement Plan</p>
           <h1>腾讯云国内产品一年采购方案</h1>
@@ -608,7 +642,7 @@
           </div>
         </dl>
       </aside>
-    </header>
+    </div>
 
     <section class="section">
       <h2>一、总体建议</h2>
