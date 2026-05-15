@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Google Cloud 半量与腾讯云国内方案对比</title>
+  <style>
+    :root {
+      --ink: #17211f;
+      --muted: #60706c;
+      --line: #d9e1dc;
+      --paper: #f8faf6;
+      --panel: #ffffff;
+      --green: #0f6b55;
+      --blue: #2457a6;
+      --amber: #b35c19;
+      --soft-green: #e7f2ed;
+      --soft-blue: #e8effb;
+      --soft-amber: #fff1df;
+      --shadow: 0 18px 50px rgba(24, 33, 31, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(15, 107, 85, 0.08), transparent 36%),
+        linear-gradient(315deg, rgba(36, 87, 166, 0.08), transparent 32%),
+        var(--paper);
+      font-family: "Aptos", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+    }
+
+    .page {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 34px 24px 72px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin: -34px -24px 26px;
+      padding: 14px 24px;
+      background: rgba(248, 250, 246, 0.88);
+      border-bottom: 1px solid rgba(217, 225, 220, 0.86);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 210px;
+    }
+
+    .brand strong {
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-size: 18px;
+      line-height: 1.1;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      padding: 4px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(24, 33, 31, 0.08);
+    }
+
+    .tab-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 18px;
+      color: var(--muted);
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-button.active {
+      color: #fff;
+      background: var(--green);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.5fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-main {
+      padding: 42px;
+      color: #ffffff;
+      background:
+        linear-gradient(135deg, rgba(15, 107, 85, 0.95), rgba(36, 87, 166, 0.92)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 14px);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      font-size: 13px;
+      text-transform: uppercase;
+      opacity: 0.82;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 1.04;
+      font-weight: 700;
+    }
+
+    .hero-main p {
+      max-width: 760px;
+      margin: 22px 0 0;
+      font-size: 18px;
+      color: rgba(255,255,255,0.86);
+    }
+
+    .brief,
+    .section {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 10px 26px rgba(24, 33, 31, 0.06);
+    }
+
+    .brief {
+      padding: 28px;
+      box-shadow: 0 12px 30px rgba(24, 33, 31, 0.08);
+    }
+
+    .brief h2,
+    .section h2 {
+      margin: 0 0 16px;
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-size: 26px;
+      line-height: 1.15;
+    }
+
+    .brief dl {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+    }
+
+    .brief dt {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .brief dd {
+      margin: 4px 0 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .section {
+      margin-top: 28px;
+      padding: 34px;
+    }
+
+    .lead {
+      margin: 0 0 22px;
+      max-width: 920px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .metric {
+      min-height: 132px;
+      padding: 22px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 30px;
+      line-height: 1;
+      color: var(--green);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 14px;
+      counter-reset: step;
+      margin-top: 20px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 16px;
+      padding: 20px;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-weight: 800;
+    }
+
+    .step h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    th,
+    td {
+      padding: 15px 16px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      color: #26322f;
+      background: #eef4f1;
+      font-size: 14px;
+    }
+
+    td {
+      color: #26322f;
+      font-size: 15px;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      color: var(--green);
+      background: var(--soft-green);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tag.blue {
+      color: var(--blue);
+      background: var(--soft-blue);
+    }
+
+    .tag.amber {
+      color: var(--amber);
+      background: var(--soft-amber);
+    }
+
+    .callout {
+      margin-top: 22px;
+      padding: 22px;
+      border-left: 5px solid var(--blue);
+      border-radius: 6px;
+      background: #f2f6fd;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .note {
+      padding: 22px;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .note h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .note ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .plan {
+      display: none;
+    }
+
+    .plan.active {
+      display: block;
+    }
+
+    .footer {
+      margin-top: 26px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .topbar-inner,
+      .hero,
+      .grid-3,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner {
+        align-items: stretch;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .tab-button {
+        padding: 10px 12px;
+      }
+
+      .hero-main,
+      .section {
+        padding: 26px;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="方案切换">
+      <div class="topbar-inner">
+        <div class="brand">
+          <strong>云服务年度采购</strong>
+          <span>Google 半量 / 腾讯云国内方案</span>
+        </div>
+        <div class="tabs" role="tablist" aria-label="采购方案">
+          <button class="tab-button active" type="button" role="tab" aria-selected="true" data-target="google-half-plan">Google 半量方案</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" data-target="tencent-plan">腾讯云国内方案</button>
+        </div>
+      </div>
+    </nav>
+
+<section id="google-half-plan" class="plan active" aria-label="半量项目一年采购方案">
+      <div class="hero">
+        <div class="hero-main">
+          <div>
+            <p class="eyebrow">Google Cloud Annual Procurement Plan - Half Scope</p>
+            <h1>Google Cloud 半量项目一年采购方案</h1>
+            <p>用于覆盖今年规划项目中约一半项目的优先上线，先完成官网、核心内部工具、重点 AI 应用和基础监控自动化，后续根据项目节奏再扩展额度。</p>
+          </div>
+        </div>
+
+        <aside class="brief">
+          <h2>建议摘要</h2>
+          <dl>
+            <div>
+              <dt>今年建议采购</dt>
+              <dd>USD 9,000 / 年</dd>
+            </div>
+            <div>
+              <dt>推荐主区域</dt>
+              <dd>Singapore<br><span class="tag">asia-southeast1</span></dd>
+            </div>
+            <div>
+              <dt>采购方式</dt>
+              <dd>年度合同<br><span class="tag blue">Partner / Reseller</span></dd>
+            </div>
+            <div>
+              <dt>采购原则</dt>
+              <dd>先买半量，后续扩展</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+
+      <section class="section">
+        <h2>一、总体建议</h2>
+        <p class="lead">如果今年所有规划项目不会一次性上线，可以先采购一年的半量 Google Cloud 服务额度。采购目标是先覆盖约一半项目的优先上线，同时保留正式域名、安全入口、数据库、监控和后续扩容能力。</p>
+        <div class="grid-3">
+          <div class="metric">
+            <strong>9,000</strong>
+            <span>建议采购 USD 9,000 / 年。预算紧张可降至 USD 7,500，预算充足可申请 USD 12,000。</span>
+          </div>
+          <div class="metric">
+            <strong>SG</strong>
+            <span>主区域仍建议新加坡 `asia-southeast1`，先覆盖核心团队访问，再按数据决定扩展区域。</span>
+          </div>
+          <div class="metric">
+            <strong>1 Year</strong>
+            <span>通过 Google Cloud Partner / Reseller 签一年合同，先买半量年度额度，后续可追加。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>二、如何采购</h2>
+        <div class="steps">
+          <div class="step"><div><h3>确认年度预算</h3><p>内部申请 Google Cloud 年度服务额度 USD 9,000 / 年，用于今年约一半规划项目优先上线。</p></div></div>
+          <div class="step"><div><h3>联系 Google Cloud Partner / Reseller</h3><p>要求对方提供年度合同、报价单、发票方式、付款方式和基础技术支持说明。</p></div></div>
+          <div class="step"><div><h3>用公司主体开通账户</h3><p>创建 Google Cloud Organization 和 Cloud Billing，不使用个人 Gmail 承载生产系统。</p></div></div>
+          <div class="step"><div><h3>配置正式上线基础设施</h3><p>优先配置 Cloud DNS、HTTPS Load Balancer、Cloud Armor、Cloud Run、Cloud SQL、Cloud Storage、Secret Manager、Monitoring / Logging。</p></div></div>
+          <div class="step"><div><h3>设置预算告警</h3><p>设置年度预算、月度预算、80% 告警、100% 告警和超额告警，避免费用失控。</p></div></div>
+          <div class="step"><div><h3>后续项目统一接入</h3><p>优先上线官网、OKR、监控系统、1-2 个重点 AI 应用和必要内部工具；其他项目根据节奏追加额度或下一阶段上线。</p></div></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>三、采购服务内容</h2>
+        <p class="lead">基础设施仍按正式域名上线标准配置，但服务规模、数据库规格、日志保留、流量预算和项目数量按半量控制。</p>
+        <table>
+          <thead><tr><th>服务</th><th>建议用途</th><th>是否购买</th><th>用途说明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag">Cloud Run</span></td><td>部署官网、AI 应用、内部工具、API 服务和后台任务。</td><td>必买</td><td>先承载优先项目，后续可新增服务。</td></tr>
+            <tr><td><span class="tag">Cloud SQL PostgreSQL</span></td><td>存储用户、项目、内容、配置、任务状态和业务数据。</td><td>必买</td><td>先从较小规格起步，按项目增长扩容。</td></tr>
+            <tr><td><span class="tag">Cloud Storage</span></td><td>存放图片、附件、报表、导出文件、日志归档和备份。</td><td>必买</td><td>先控制存储和备份保留量。</td></tr>
+            <tr><td><span class="tag blue">Cloud DNS</span></td><td>管理正式域名和各项目子域名。</td><td>必买</td><td>统一规划 `www`、`ai`、`tools`、`admin`、`staging` 等子域名。</td></tr>
+            <tr><td><span class="tag blue">Global HTTPS Load Balancer</span></td><td>正式域名统一 HTTPS 入口、证书、转发规则和后端服务管理。</td><td>必买</td><td>按正式域名上线标准启用。</td></tr>
+            <tr><td><span class="tag blue">Cloud Armor</span></td><td>WAF、防刷、防攻击、IP/地区访问规则和基础安全防护。</td><td>必买</td><td>先启用基础规则，复杂策略后续扩展。</td></tr>
+            <tr><td><span class="tag amber">Secret Manager</span></td><td>管理 API Key、数据库密码、AI 模型密钥和第三方服务凭证。</td><td>必买</td><td>避免密钥散落在代码、配置文件或个人电脑里。</td></tr>
+            <tr><td><span class="tag amber">Cloud Scheduler</span></td><td>定时监控、定时汇报、自动同步、批量生成等任务。</td><td>必买</td><td>支撑监控、链接检测、日报生成等场景。</td></tr>
+            <tr><td><span class="tag amber">Pub/Sub</span></td><td>AI 生成、爬取、通知、批处理等异步任务解耦。</td><td>建议购买</td><td>项目变多后可避免所有任务直接压在 Web 服务上。</td></tr>
+            <tr><td><span class="tag amber">Artifact Registry</span></td><td>存放 Cloud Run 容器镜像。</td><td>必买</td><td>作为多个系统统一发布的镜像仓库。</td></tr>
+            <tr><td><span class="tag amber">Monitoring / Logging</span></td><td>监控、日志、告警、错误排查、系统稳定性和费用观察。</td><td>必买</td><td>半量方案需要更严格控制日志保留周期。</td></tr>
+            <tr><td><span class="tag amber">Network Egress</span></td><td>全球用户访问、图片文件下载、API 响应产生的出口流量。</td><td>必买</td><td>正式上线后持续观察；必要时用 Cloud CDN 优化。</td></tr>
+          </tbody>
+        </table>
+        <div class="callout"><strong>年度采购金额建议：USD 9,000 / 年</strong>这笔费用作为今年半量项目的 Google Cloud 平台服务额度，适合先上线约一半项目并保留后续扩展空间。外部 AI 模型 API 费用建议单独设预算。</div>
+      </section>
+
+      <section class="section">
+        <h2>四、覆盖项目范围</h2>
+        <div class="two-col">
+          <div class="note">
+            <h3>今年优先覆盖的项目类型</h3>
+            <ul>
+              <li>官网与展示类：wukong 官网或 AI 官网中优先 1 个。</li>
+              <li>内部工具类：OKR 汇报、需求沟通或 matrix 中优先 1-2 个。</li>
+              <li>监控自动化类：链接失效检测、帖子下架监控中优先 1 个。</li>
+              <li>AI 应用类：AI 翻译、AI 点菜、AI 新闻阅读、AI 英语学习中优先 1-2 个。</li>
+              <li>暂缓项目：AI 招聘、AI 运维、通用 Token 或大型平台化项目可放到后续扩展。</li>
+            </ul>
+          </div>
+          <div class="note">
+            <h3>正式域名建议</h3>
+            <ul>
+              <li>`www.company.com`：官网。</li>
+              <li>`ai.company.com`：AI 项目入口。</li>
+              <li>`tools.company.com`：内部工具入口。</li>
+              <li>`admin.company.com`：后台管理。</li>
+              <li>`staging.company.com`：测试环境。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout"><strong>区域建议</strong>主区域建议新加坡 `asia-southeast1`。半量方案先不做多区域部署，香港、中国大陆、中东、俄罗斯等团队上线前做访问测速；如后续访问量明显增长，再追加香港、中东或欧洲区域资源。</div>
+      </section>
+
+      <section class="section">
+        <h2>五、年度预算拆分</h2>
+        <table>
+          <thead><tr><th>模块</th><th>年度预算口径</th></tr></thead>
+          <tbody>
+            <tr><td>Cloud Run 半量项目部署</td><td>USD 1,200-2,000</td></tr>
+            <tr><td>Cloud SQL PostgreSQL</td><td>USD 1,800-2,800</td></tr>
+            <tr><td>Load Balancer + Cloud Armor</td><td>USD 800-1,300</td></tr>
+            <tr><td>Cloud Storage + 备份</td><td>USD 400-800</td></tr>
+            <tr><td>Cloud DNS + Secret Manager + Artifact Registry</td><td>USD 300-600</td></tr>
+            <tr><td>Scheduler + Pub/Sub + 后台任务</td><td>USD 400-800</td></tr>
+            <tr><td>Monitoring / Logging</td><td>USD 800-1,500</td></tr>
+            <tr><td>网络出口 / CDN</td><td>USD 800-1,800</td></tr>
+            <tr><td>增长与突发 buffer</td><td>USD 1,500-2,500</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <h2>六、付费方式与采购注意事项</h2>
+        <p class="lead">建议仍走 Google Cloud Partner / Reseller 年度合同采购，由公司一次性采购一年的半量服务额度。这样可以先满足今年核心项目上线，后续项目增多时再追加额度。</p>
+        <table>
+          <thead><tr><th>方式</th><th>建议</th></tr></thead>
+          <tbody>
+            <tr><td>Google Cloud Partner / Reseller 年度合同</td><td>最推荐。公司一次性采购一年半量服务额度，由代理商提供合同、发票、付款安排和必要支持。</td></tr>
+            <tr><td>Google Cloud 自助账号 + 信用卡</td><td>可用，但不推荐作为公司长期生产采购方式。</td></tr>
+            <tr><td>1 年 Committed Use Discounts</td><td>半量方案可先不购买 CUD，运行稳定后再对 Cloud SQL 或长期计算资源购买 1 年承诺折扣。</td></tr>
+            <tr><td>企业月结发票</td><td>可咨询 Google 或 Partner，但通常有更高消费门槛；对当前预算更适合走 Partner 年度采购。</td></tr>
+          </tbody>
+        </table>
+        <div class="callout"><strong>最终采购口径</strong>今年可先采购 USD 9,000 / 年的 Google Cloud 服务额度，用于覆盖约一半规划项目的优先上线；后续项目启动后再追加额度或升级到完整年度方案。</div>
+      </section>
+    </section>
+
+<section id="tencent-plan" class="plan" aria-label="腾讯云国内产品年度采购方案">
+<header>
+      <div class="hero">
+        <div>
+          <p class="eyebrow">Tencent Cloud Annual Procurement Plan</p>
+          <h1>腾讯云国内产品一年采购方案</h1>
+          <p>用于承载中国大陆为主的小程序、国内 App、微信生态工具和国内用户访问入口。建议按一年服务额度采购，避免每个小程序或 App 单独重复走公司预算申请。</p>
+        </div>
+      </div>
+
+      <aside class="brief">
+        <h2>建议摘要</h2>
+        <dl>
+          <div>
+            <dt>今年建议采购</dt>
+            <dd>RMB 60,000 / 年</dd>
+          </div>
+          <div>
+            <dt>推荐定位</dt>
+            <dd>国内入口<br><span class="tag">微信生态优先</span></dd>
+          </div>
+          <div>
+            <dt>采购方式</dt>
+            <dd>包年包月 + 资源包</dd>
+          </div>
+          <div>
+            <dt>承载规模</dt>
+            <dd>5-10 个轻量产品/工具</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <section class="section">
+      <h2>一、总体建议</h2>
+      <p class="lead">腾讯云建议作为中国大陆产品的补充云平台，和 Google Cloud 形成双云分工：Google Cloud 继续服务全球团队与海外系统，腾讯云承载国内小程序、国内 App、微信登录/支付、国内 CDN、备案、短信和合规访问入口。</p>
+
+      <div class="grid-3">
+        <div class="metric">
+          <strong>60,000</strong>
+          <span>建议采购 RMB 60,000 / 年。适合 5-10 个轻量小程序、App 后端或内部工具逐步上线。</span>
+        </div>
+        <div class="metric">
+          <strong>CN</strong>
+          <span>国内用户访问、备案、微信生态、短信、CDN 和内容合规能力放在腾讯云。</span>
+        </div>
+        <div class="metric">
+          <strong>60k+</strong>
+          <span>如果出现多个正式 C 端产品、较高短信/CDN/日志量，可再扩展到 RMB 100,000 / 年以上。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>二、如何采购</h2>
+      <div class="steps">
+        <div class="step">
+          <div>
+            <h3>确认年度预算</h3>
+            <p>内部申请腾讯云年度服务额度 RMB 60,000 / 年，用于 5-10 个国内轻量小程序、App 后端和微信生态产品逐步上线。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>企业实名认证与合同发票</h3>
+            <p>使用公司主体完成腾讯云企业认证，确认合同、发票、付款方式和采购流程。若公司要求供应商合同，可联系腾讯云销售或代理商。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>准备域名与备案</h3>
+            <p>国内小程序和 App 建议提前准备国内域名、ICP备案、App 备案、小程序备案所需资料，避免开发完成后卡在审核环节。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>先开通基础服务</h3>
+            <p>优先开通 DNSPod、CVM/轻量应用服务器、CloudBase、TencentDB、COS、CDN、SSL、CLS、云监控、CAM、短信等基础服务。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>设置预算告警</h3>
+            <p>设置年度预算、月度预算、80% 告警、100% 告警和超额提醒，尤其关注 CDN、短信、日志、对象存储和数据库费用。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>三、采购服务内容</h2>
+      <p class="lead">以下服务建议纳入腾讯云年度采购范围，用于国内正式域名、备案、小程序后端、国内 App API、文件存储、短信、日志、安全和后续扩展。</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>服务</th>
+            <th>是否购买</th>
+            <th>用途说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag">CloudBase 云开发</span></td>
+            <td>建议购买</td>
+            <td>适合微信小程序、Web、移动 App、管理后台和 AI 应用的 Serverless 后端，包含数据库、存储、身份认证、云函数、云托管等能力。</td>
+          </tr>
+          <tr>
+            <td><span class="tag">CVM / 轻量应用服务器</span></td>
+            <td>必买</td>
+            <td>承载国内 API、管理后台、定时任务、反向代理或传统后端服务。轻量应用服务器适合起步，CVM 适合正式生产扩展。</td>
+          </tr>
+          <tr>
+            <td><span class="tag">TencentDB MySQL / PostgreSQL</span></td>
+            <td>必买</td>
+            <td>存储用户、订单、内容、配置、项目数据和业务记录。小程序轻量场景也可先用 CloudBase 数据库。</td>
+          </tr>
+          <tr>
+            <td><span class="tag">COS 对象存储</span></td>
+            <td>必买</td>
+            <td>存放图片、附件、导出文件、报表、用户上传素材、备份文件，并可与 CDN 配合加速。</td>
+          </tr>
+          <tr>
+            <td><span class="tag green">DNSPod + SSL 证书</span></td>
+            <td>必买</td>
+            <td>管理国内域名解析、正式 HTTPS 域名和小程序合法域名。</td>
+          </tr>
+          <tr>
+            <td><span class="tag green">CDN / EdgeOne</span></td>
+            <td>建议购买</td>
+            <td>加速国内图片、静态资源、下载文件和 H5 页面；访问量增长后可升级安全与边缘能力。</td>
+          </tr>
+          <tr>
+            <td><span class="tag green">CLB + WAF</span></td>
+            <td>按需购买</td>
+            <td>正式公网入口、负载均衡和 Web 安全防护。早期轻量项目可先不开 WAF，公网业务稳定后补上。</td>
+          </tr>
+          <tr>
+            <td><span class="tag amber">短信 SMS</span></td>
+            <td>建议购买</td>
+            <td>国内手机号登录、验证码、通知短信。短信量可能增长较快，建议单独设置额度。</td>
+          </tr>
+          <tr>
+            <td><span class="tag amber">CLS 日志服务 + 云监控</span></td>
+            <td>必买</td>
+            <td>日志、告警、错误排查、访问监控、费用观察和稳定性分析。</td>
+          </tr>
+          <tr>
+            <td><span class="tag amber">CAM + KMS / 凭据管理</span></td>
+            <td>必买</td>
+            <td>团队权限、子账号、服务账号、API Key、数据库密码和第三方密钥管理。</td>
+          </tr>
+          <tr>
+            <td><span class="tag amber">内容安全</span></td>
+            <td>按需购买</td>
+            <td>如有用户生成内容、评论、图片上传、AI 生成内容，建议接入文本/图片内容安全审核。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>年度采购金额建议：RMB 60,000 / 年</strong>
+        这笔费用适合国内小程序/国内 App 的标准型上线预算，可覆盖 5-10 个轻量产品/工具的基础服务器、数据库、对象存储、CDN、短信、日志、备案相关资源和基础安全能力。AI 模型 API、内容审核高调用量、短信高调用量建议单独设置上限。
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>四、适用产品范围</h2>
+      <div class="two-col">
+        <div class="note">
+          <h3>优先适合腾讯云承载</h3>
+          <ul>
+            <li>微信小程序、公众号 H5、企业微信工具。</li>
+            <li>国内 App 的 API 入口、短信、文件、图片和下载资源。</li>
+            <li>国内用户访问频率高的工具类产品。</li>
+            <li>涉及微信登录、微信支付、OpenID/UnionID 的产品。</li>
+            <li>需要 ICP 备案、App 备案、小程序备案的国内业务。</li>
+          </ul>
+        </div>
+        <div class="note">
+          <h3>不建议放在腾讯云的部分</h3>
+          <ul>
+            <li>海外团队内部工具仍可继续放 Google Cloud。</li>
+            <li>全球统一后台和海外数据分析仍可放 Google Cloud。</li>
+            <li>外部 AI 模型调用费用不建议混入腾讯云基础云预算。</li>
+            <li>强依赖海外第三方 API 的服务需评估国内访问稳定性。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>五、年度预算拆分</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>模块</th>
+            <th>年度预算口径</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CVM / 轻量应用服务器 / 云托管</td>
+            <td>RMB 8,000-12,000</td>
+          </tr>
+          <tr>
+            <td>TencentDB / CloudBase 数据库</td>
+            <td>RMB 10,000-15,000</td>
+          </tr>
+          <tr>
+            <td>COS 对象存储 + 备份</td>
+            <td>RMB 3,000-5,000</td>
+          </tr>
+          <tr>
+            <td>CDN / EdgeOne / 流量</td>
+            <td>RMB 6,000-10,000</td>
+          </tr>
+          <tr>
+            <td>DNSPod + SSL + 域名相关</td>
+            <td>RMB 1,000-2,000</td>
+          </tr>
+          <tr>
+            <td>短信 SMS</td>
+            <td>RMB 5,000-8,000</td>
+          </tr>
+          <tr>
+            <td>CLS 日志 + 云监控</td>
+            <td>RMB 4,000-7,000</td>
+          </tr>
+          <tr>
+            <td>安全与权限：WAF / CAM / KMS / 内容安全</td>
+            <td>RMB 5,000-8,000</td>
+          </tr>
+          <tr>
+            <td>增长与突发 buffer</td>
+            <td>RMB 8,000-12,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>扩展预算建议</strong>
+        如果国内小程序和 App 会快速增加，或出现多个正式 C 端产品，建议把年度预算提升到 RMB 100,000 / 年以上，用于更正式的数据库规格、WAF、安全、CDN 流量、短信量、日志量和多项目部署。
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>六、付费方式与采购注意事项</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>方式</th>
+            <th>建议</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>包年包月</td>
+            <td>适合 CVM、数据库、固定带宽、部分安全服务等长期稳定资源，建议按一年购买。</td>
+          </tr>
+          <tr>
+            <td>资源包 / 预付费包</td>
+            <td>适合 COS、CDN、短信、日志等可预估消耗的服务，便于控制年度预算。</td>
+          </tr>
+          <tr>
+            <td>按量计费</td>
+            <td>适合早期测试或不确定用量的服务，但需要配预算告警，避免突发费用。</td>
+          </tr>
+          <tr>
+            <td>腾讯云销售 / 代理商合同</td>
+            <td>如果公司需要合同、发票、年度采购流程，建议联系腾讯云销售或授权代理商统一报价。</td>
+          </tr>
+          <tr>
+            <td>不建议</td>
+            <td>不建议用个人账号、个人付款方式或每个小程序单独采购生产资源。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>七、与 Google Cloud 的分工</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>平台</th>
+            <th>定位</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google Cloud</td>
+            <td>全球团队工具、海外官网、海外 AI 工具、全球后台、海外数据服务。</td>
+          </tr>
+          <tr>
+            <td>腾讯云</td>
+            <td>中国大陆小程序、国内 App 入口、国内 CDN、微信生态、备案、短信、国内用户访问。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>最终采购口径</strong>
+        建议今年补充采购 RMB 60,000 / 年的腾讯云国内产品服务额度，作为 Google Cloud 全球平台的国内补充，用于承载 5-10 个轻量小程序、国内 App 后端和微信生态相关服务。
+      </div>
+    </section>
+
+    <p class="footer">参考：腾讯云 CloudBase 文档、腾讯云 CloudBase 产品说明、腾讯云 CVM 购买指南、腾讯云 COS 产品说明、腾讯云/华为云 ICP 备案说明。正式采购前建议由腾讯云销售或代理商出具正式报价单。</p>
+</section>
+
+    <p class="footer">备注：本页面用于公司年度采购申请和方案对比。实际费用会受区域、流量、日志量、数据库规格、请求量、短信量、CDN、折扣和汇率影响；正式采购前建议分别由 Google Cloud Partner / Reseller 与腾讯云销售或代理商出具正式报价。</p>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll(".tab-button");
+    const plans = document.querySelectorAll(".plan");
+
+    function activatePlan(targetId) {
+      buttons.forEach((button) => {
+        const isActive = button.dataset.target === targetId;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+      });
+
+      plans.forEach((plan) => {
+        plan.classList.toggle("active", plan.id === targetId);
+      });
+
+      window.history.replaceState(null, "", `#${targetId}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => activatePlan(button.dataset.target));
+    });
+
+    const initial = window.location.hash.replace("#", "");
+    if (initial === "google-half-plan" || initial === "tencent-plan") {
+      activatePlan(initial);
+    } else {
+      activatePlan("google-half-plan");
+    }
+  </script>
+</body>
+</html>
