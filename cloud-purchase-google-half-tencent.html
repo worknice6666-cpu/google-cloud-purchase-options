@@ -523,6 +523,7 @@
           <div class="step"><div><h3>联系 Google Cloud Partner / Reseller</h3><p>要求对方提供年度合同、报价单、发票方式、付款方式和基础技术支持说明。</p></div></div>
           <div class="step"><div><h3>用公司主体开通账户</h3><p>创建 Google Cloud Organization 和 Cloud Billing，不使用个人 Gmail 承载生产系统。</p></div></div>
           <div class="step"><div><h3>配置正式上线基础设施</h3><p>优先配置 Cloud DNS、HTTPS Load Balancer、Cloud Armor、Cloud Run、Cloud SQL、Cloud Storage、Secret Manager、Monitoring / Logging。</p></div></div>
+          <div class="step"><div><h3>配置 CI/CD 发布流水线</h3><p>接入 GitHub / GitLab，使用 Cloud Build、Artifact Registry、Cloud Run Deploy 和 Secret Manager，形成统一构建、镜像、发布和密钥管理流程。</p></div></div>
           <div class="step"><div><h3>设置预算告警</h3><p>设置年度预算、月度预算、80% 告警、100% 告警和超额告警，避免费用失控。</p></div></div>
           <div class="step"><div><h3>后续项目统一接入</h3><p>优先上线官网、OKR、监控系统、1-2 个重点 AI 应用和必要内部工具；其他项目根据节奏追加额度或下一阶段上线。</p></div></div>
         </div>
@@ -543,7 +544,9 @@
             <tr><td><span class="tag amber">Secret Manager</span></td><td>管理 API Key、数据库密码、AI 模型密钥和第三方服务凭证。</td><td>必买</td><td>避免密钥散落在代码、配置文件或个人电脑里。</td></tr>
             <tr><td><span class="tag amber">Cloud Scheduler</span></td><td>定时监控、定时汇报、自动同步、批量生成等任务。</td><td>必买</td><td>支撑监控、链接检测、日报生成等场景。</td></tr>
             <tr><td><span class="tag amber">Pub/Sub</span></td><td>AI 生成、爬取、通知、批处理等异步任务解耦。</td><td>建议购买</td><td>项目变多后可避免所有任务直接压在 Web 服务上。</td></tr>
+            <tr><td><span class="tag amber">Cloud Build</span></td><td>代码合并后自动测试、构建 Docker 镜像并触发发布。</td><td>必买</td><td>支撑多个项目统一 CI/CD，不需要单独购买 Jenkins 服务器。</td></tr>
             <tr><td><span class="tag amber">Artifact Registry</span></td><td>存放 Cloud Run 容器镜像。</td><td>必买</td><td>作为多个系统统一发布的镜像仓库。</td></tr>
+            <tr><td><span class="tag amber">Cloud Deploy</span></td><td>管理测试、预发、正式环境的渐进式发布。</td><td>建议购买</td><td>早期可先用 Cloud Build 直接部署，项目增多后再启用标准发布流程。</td></tr>
             <tr><td><span class="tag amber">Monitoring / Logging</span></td><td>监控、日志、告警、错误排查、系统稳定性和费用观察。</td><td>必买</td><td>半量方案需要更严格控制日志保留周期。</td></tr>
             <tr><td><span class="tag amber">Network Egress</span></td><td>全球用户访问、图片文件下载、API 响应产生的出口流量。</td><td>必买</td><td>正式上线后持续观察；必要时用 Cloud CDN 优化。</td></tr>
           </tbody>
@@ -552,7 +555,36 @@
       </section>
 
       <section class="section">
-        <h2>四、覆盖项目范围</h2>
+        <h2>四、CI/CD 与研发交付能力</h2>
+        <p class="lead">Google Cloud 半量方案建议明确包含 CI/CD 能力，方便后续多个系统陆续上线时复用同一套发布标准，减少人工部署和环境差异。</p>
+        <div class="two-col">
+          <div class="note">
+            <h3>推荐发布流程</h3>
+            <ul>
+              <li>代码仓库：GitHub / GitLab 承载业务代码。</li>
+              <li>自动构建：合并到 `main`、`release` 或指定分支后触发 Cloud Build。</li>
+              <li>镜像管理：构建后的 Docker 镜像推送到 Artifact Registry。</li>
+              <li>自动部署：Cloud Build 直接部署到 Cloud Run；项目增多后使用 Cloud Deploy 管理测试、预发、正式环境。</li>
+              <li>密钥管理：数据库密码、API Key、AI 模型密钥统一放在 Secret Manager。</li>
+              <li>发布观察：Cloud Logging / Monitoring 记录构建、部署、运行日志和告警。</li>
+            </ul>
+          </div>
+          <div class="note">
+            <h3>对技术团队的评估重点</h3>
+            <ul>
+              <li>每个项目是否容器化，是否能用 Cloud Run 标准部署。</li>
+              <li>是否需要区分 `dev`、`staging`、`production` 三套环境。</li>
+              <li>是否需要审批发布、回滚、灰度或分批上线。</li>
+              <li>是否需要统一代码规范、自动测试、安全扫描和镜像版本管理。</li>
+              <li>是否有国内项目需要另走腾讯云流水线，避免跨境访问影响发布效率。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout"><strong>采购口径</strong>CI/CD 不建议单独购买服务器。Cloud Build、Artifact Registry、Cloud Deploy、Secret Manager 和 Logging 都放在同一个 Google Cloud Billing 账户里按量使用，纳入 USD 9,000 / 年半量预算统一管理。</div>
+      </section>
+
+      <section class="section">
+        <h2>五、覆盖项目范围</h2>
         <div class="two-col">
           <div class="note">
             <h3>今年优先覆盖的项目类型</h3>
@@ -579,7 +611,7 @@
       </section>
 
       <section class="section">
-        <h2>五、年度预算拆分</h2>
+        <h2>六、年度预算拆分</h2>
         <table>
           <thead><tr><th>模块</th><th>年度预算口径</th></tr></thead>
           <tbody>
@@ -587,7 +619,8 @@
             <tr><td>Cloud SQL PostgreSQL</td><td>USD 1,800-2,800</td></tr>
             <tr><td>Load Balancer + Cloud Armor</td><td>USD 800-1,300</td></tr>
             <tr><td>Cloud Storage + 备份</td><td>USD 400-800</td></tr>
-            <tr><td>Cloud DNS + Secret Manager + Artifact Registry</td><td>USD 300-600</td></tr>
+            <tr><td>Cloud DNS + Secret Manager</td><td>USD 200-500</td></tr>
+            <tr><td>Cloud Build + Artifact Registry + Cloud Deploy</td><td>USD 400-900</td></tr>
             <tr><td>Scheduler + Pub/Sub + 后台任务</td><td>USD 400-800</td></tr>
             <tr><td>Monitoring / Logging</td><td>USD 800-1,500</td></tr>
             <tr><td>网络出口 / CDN</td><td>USD 800-1,800</td></tr>
@@ -597,7 +630,7 @@
       </section>
 
       <section class="section">
-        <h2>六、付费方式与采购注意事项</h2>
+        <h2>七、付费方式与采购注意事项</h2>
         <p class="lead">建议仍走 Google Cloud Partner / Reseller 年度合同采购，由公司一次性采购一年的半量服务额度。这样可以先满足今年核心项目上线，后续项目增多时再追加额度。</p>
         <table>
           <thead><tr><th>方式</th><th>建议</th></tr></thead>
